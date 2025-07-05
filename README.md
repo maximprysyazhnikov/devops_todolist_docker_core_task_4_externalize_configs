@@ -40,6 +40,26 @@ or start on the [landing page](http://localhost:8000/)
 4. TODO App should work as before
 5. Create PR with your changes and attach it for validation on a platform
 
+# Django-Todolist
+
+## Environment Variables
+
+The application supports the following environment variables:
+
+- `ENGINE` - Database engine (default: django.db.backends.sqlite3)
+- `NAME` - Database name (default: db.sqlite3)
+- `USER` - Database user (default: empty)
+- `PASSWORD` - Database password (default: empty)
+- `HOST` - Database host (default: empty)
+- `PORT` - Database port (default: empty)
+
+## Quick Start
+
+### With PostgreSQL:
+```bash
+cp .env.example .env
+# Edit .env with your database settings
+docker-compose up --build
 
 
 

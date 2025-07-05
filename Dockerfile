@@ -1,24 +1,20 @@
-# Stage 1: Build Stage
-ARG PYTHON_VERSION=3.8
-FROM python:${PYTHON_VERSION} as builder
+FROM python:3.9-slim
 
-# Set the working directory
+# Системні залежності для PostgreSQL
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
+
+# Встановити Python залежності
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Копіювати код
 COPY . .
 
-# Stage 2: Run Stage
-FROM python:${PYTHON_VERSION} as run
+EXPOSE 8000
 
-WORKDIR /app
-
-ENV PYTHONUNBUFFERED=1
-
-COPY --from=builder /app .
-
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
-
-EXPOSE 8080
-
-# Run database migrations and start the Django application
-ENTRYPOINT ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8080"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

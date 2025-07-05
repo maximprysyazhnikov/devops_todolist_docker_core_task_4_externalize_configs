@@ -1,38 +1,36 @@
-# docker-compose.yml
-version: '3'
-networks:
-  todoapp-net:
+version: '3.8'
+
 services:
-  pythonapp:
-    image: todoapp:2.0.0
-    build:
-      context: .
-      dockerfile: Dockerfile
+  web:
+    build: .
+    image: django-todolist:1.0.0  # Семантичне версіонування
     ports:
-      - "8080:8080"
+      - "8000:8000"
     environment:
-      - PYTHONUNBUFFERED=1
-    networks:
-      - todoapp-net
-    depends_on:
-      - mysql
-    restart: unless-stopped
-  mysql:
-    image: mysql-local:1.0.0
-    build:
-      context: .
-      dockerfile: Dockerfile.mysql
-    container_name: my-sql
-    ports:
-      - "3306:3306"
+      - ENGINE=${ENGINE:-django.db.backends.sqlite3}
+      - NAME=${NAME:-db.sqlite3}
+      - USER=${USER:-}
+      - PASSWORD=${PASSWORD:-}
+      - HOST=${HOST:-}
+      - PORT=${PORT:-}
     volumes:
-      - todoapp-db-data:/var/lib/mysql
+      - .:/app
+    depends_on:
+      - db
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+
+  db:
+    image: postgres:13
     environment:
-      - MYSQL_ROOT_PASSWORD=1234
-      - MYSQL_DATABASE=app_db
-      - MYSQL_USER=app_user
-      - MYSQL_PASSWORD=1234
-    networks:
-      - todoapp-net
+      - POSTGRES_DB=${NAME:-todolist}
+      - POSTGRES_USER=${USER:-postgres}
+      - POSTGRES_PASSWORD=${PASSWORD:-postgres}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
 volumes:
-  todoapp-db-data:
+  postgres_data:
