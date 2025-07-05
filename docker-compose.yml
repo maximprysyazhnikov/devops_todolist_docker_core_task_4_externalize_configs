@@ -1,11 +1,13 @@
 version: '3.8'
 
 services:
+  # Django Web Application
   web:
     build: .
-    image: django-todolist:1.0.0  # Семантичне версіонування
+    image: django-todolist:1.0.0
     ports:
       - "8000:8000"
+    # Environment variables for Django application
     environment:
       - ENGINE=${ENGINE:-django.db.backends.sqlite3}
       - NAME=${NAME:-db.sqlite3}
@@ -21,12 +23,15 @@ services:
       sh -c "python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
 
+  # PostgreSQL Database (used when ENGINE=django.db.backends.postgresql)
   db:
     image: postgres:13
+    # Environment variables for PostgreSQL container
+    # These are used by PostgreSQL itself, not by Django
     environment:
-      - POSTGRES_DB=${NAME:-todolist}
-      - POSTGRES_USER=${USER:-postgres}
-      - POSTGRES_PASSWORD=${PASSWORD:-postgres}
+      - POSTGRES_DB=${DB_NAME:-todolist}
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
